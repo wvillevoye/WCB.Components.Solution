@@ -1,0 +1,24 @@
+﻿@page "/wcb-switch-demo"
+
+<h4>WCBSwitch Component</h4>
+<p>De status van deze schakelaar wordt hieronder weergegeven.</p>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <WCBSwitch LabelText="Schakel Mij Aan" @bind-Value="_switchValue" />
+    <span class="fs-5">
+        <strong>Status:</strong> @_switchValue
+    </span>
+</div>
+
+@if (_switchValue)
+{
+    <WCBCallout Message="De schakelaar is nu AAN. Goed gedaan!" Type="AlertType.Success" Dismissible="true" />
+}
+else
+{
+    <WCBCallout Message="De schakelaar is nu UIT. Klik erop om hem aan te zetten." Type="AlertType.Info" Dismissible="true" />
+}
+
+@code {
+    private bool _switchValue = false;
+}

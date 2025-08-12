@@ -1,0 +1,37 @@
+﻿@typeparam TNode
+@using Microsoft.AspNetCore.Components.Routing
+
+<ul class="list-group">
+    @foreach (var node in Nodes)
+    {
+        <li class="list-group-item p-1">
+            <NavLink class="nav-link d-flex align-items-center" href="@GetHref(node)" Match="NavLinkMatch.Prefix">
+                <span class="@GetIconClass(node) me-2"></span>
+                <span>@GetLabel(node)</span>
+            </NavLink>
+
+            @if (HasChildren(node))
+            {
+                <WCBTree TNode="TNode"
+                         Nodes="GetChildren(node)"
+                         GetLabel="GetLabel"
+                         GetIconClass="GetIconClass"
+                         GetHref="GetHref"
+                         GetChildren="GetChildren"
+                         OnItemClicked="OnItemClicked" />
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public List<TNode> Nodes { get; set; } = new();
+    [Parameter] public Func<TNode, string> GetLabel { get; set; } = _ => "";
+    [Parameter] public Func<TNode, string> GetIconClass { get; set; } = _ => "";
+    [Parameter] public Func<TNode, string> GetHref { get; set; } = _ => "#";
+    [Parameter] public Func<TNode, List<TNode>> GetChildren { get; set; } = _ => new List<TNode>();
+
+    [Parameter] public EventCallback<TNode> OnItemClicked { get; set; }
+
+    private bool HasChildren(TNode node) => GetChildren(node).Any();
+}

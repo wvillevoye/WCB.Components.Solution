@@ -1,0 +1,61 @@
+﻿<div class="form-check form-switch @CssClass">
+    <input class="form-check-input"
+           type="checkbox"
+           role="switch"
+           id="@_uniqueId"
+           checked="@Value"
+           disabled="@Disabled"
+           onchange="@((ChangeEventArgs e) => OnValueChange(e))" />
+    <label class="form-check-label" for="@_uniqueId">
+        @LabelText
+    </label>
+</div>
+
+@code {
+    private readonly string _uniqueId = $"switch_{Guid.NewGuid().ToString("N")[..8]}";
+
+    /// <summary>
+    /// De booleaanse waarde van de schakelaar (true voor aan, false voor uit).
+    /// De parameter naam 'Value' is vereist voor de @bind-Value conventie.
+    /// </summary>
+    [Parameter]
+    public bool Value { get; set; }
+
+    /// <summary>
+    /// EventCallback om de geselecteerde waarde terug te sturen naar de parent component.
+    /// De naam 'ValueChanged' is vereist voor de @bind-Value conventie.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    /// <summary>
+    /// De tekst die naast de schakelaar wordt weergegeven.
+    /// </summary>
+    [Parameter]
+    public string LabelText { get; set; } = "Schakelaar";
+
+    /// <summary>
+    /// Bepaalt of de schakelaar uitgeschakeld is.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Optionele CSS-klasse voor extra styling van de container.
+    /// </summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// Methode die wordt aangeroepen wanneer de schakelaar wordt omgezet.
+    /// </summary>
+    /// <param name="e">De gebeurtenisargumenten van het veranderde input-element.</param>
+    private async Task OnValueChange(ChangeEventArgs e)
+    {
+        if (e.Value is bool newValue && newValue != Value)
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+        }
+    }
+}

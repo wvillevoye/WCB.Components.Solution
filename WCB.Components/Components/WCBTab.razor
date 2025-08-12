@@ -1,0 +1,29 @@
+﻿@implements IDisposable
+
+@code {
+    // Gebruik [CascadingParameter] om de parent-component op te halen
+    [CascadingParameter]
+    public WCBTabs? ParentTabs { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InvokeAsync(() => ParentTabs?.RegisterTab(this));
+        }
+    }
+
+    public void Dispose()
+    {
+        ParentTabs?.UnregisterTab(this);
+    }
+}

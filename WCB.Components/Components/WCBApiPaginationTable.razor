@@ -1,0 +1,79 @@
+﻿@using WCB.Components.Services.WCBPagination
+@typeparam T
+
+@inject WCBApiService Api
+@inject WCBApiPaginationService Pagination
+
+<div>
+    <table class="table table-striped">
+        <thead class="table-dark">
+            @TableHeader
+        </thead>
+        <tbody>
+            @if (Items is null)
+            {
+                <tr>
+                    <td colspan="99">Laden...</td>
+                </tr>
+            }
+            else if (!Items.Any())
+            {
+                <tr>
+                    <td colspan="99">Geen resultaten gevonden.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Items)
+                {
+                    @RowTemplate(item)
+                }
+            }
+        </tbody>
+    </table>
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(Pagination.HasFirst ? "" : "disabled")">
+                <button class="page-link" onclick="@(() => LoadPage(Pagination.GetFirst()))">First</button>
+            </li>
+            <li class="page-item @(Pagination.HasPrev ? "" : "disabled")">
+                <button class="page-link" onclick="@(() => LoadPage(Pagination.GetPrev()))">Previous</button>
+            </li>
+            <li class="page-item @(Pagination.HasNext ? "" : "disabled")">
+                <button class="page-link" onclick="@(() => LoadPage(Pagination.GetNext()))">Next</button>
+            </li>
+            <li class="page-item @(Pagination.HasLast ? "" : "disabled")">
+                <button class="page-link" onclick="(() => LoadPage(Pagination.GetLast()))">Last</button>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@code {
+    [Parameter] public string ApiUrl { get; set; } = string.Empty;
+    [Parameter] public RenderFragment TableHeader { get; set; } = default!;
+    [Parameter] public RenderFragment<T> RowTemplate { get; set; } = default!;
+
+    private List<T>? Items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ApiUrl))
+        {
+            await LoadPage(ApiUrl);
+        }
+    }
+
+    private async Task LoadPage(string? url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return;
+
+        var (data, links) = await Api.GetWithHeadersAsync<List<T>>(url);
+        Items = data ?? new List<T>();
+        Pagination.UpdateLinks(links);
+        StateHasChanged();
+    }
+}
+

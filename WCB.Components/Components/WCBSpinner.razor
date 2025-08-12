@@ -1,0 +1,21 @@
+﻿<div class="spinner-container">
+    <div class="spinner-@Type.ToString().ToLower()"></div>
+</div>
+
+@code {
+    /// <summary>
+    /// Definieert de beschikbare stijlen voor de spinner.
+    /// </summary>
+    public enum SpinnerType
+    {
+        Circle,
+        Bar
+    }
+
+    /// <summary>
+    /// De geselecteerde spinner-stijl. Standaard is het een cirkel.
+    /// </summary>
+    [Parameter]
+    public SpinnerType Type { get; set; } = SpinnerType.Circle;
+}
+

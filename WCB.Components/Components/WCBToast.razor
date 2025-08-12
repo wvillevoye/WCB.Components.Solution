@@ -1,0 +1,154 @@
+﻿@* Bestand: WCB.Components/Components/WCBToast/WCBToast.razor *@
+@* Deze component rendert en beheert Bootstrap Toasts. *@
+@using WCB.Components.Services
+@using WCB.Components.Services.Shared
+@inject WCBToastService ToastService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="toast-container p-3 @GetPositionClass()" style="z-index: 1060; right: 0;">
+    @foreach (var toast in _currentToasts)
+    {
+        <div class="toast show fade bg-@toast.Type.ToString().ToLower()" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="@GetIconClass(toast.Type) me-2"></i> @* Icon added *@
+                <strong class="me-auto text-dark">@toast.Title</strong>
+                <small class="text-muted">@GetTimeAgo(toast.Timestamp)</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-white">
+                @toast.Message
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public WCBToastPosition Position { get; set; } = WCBToastPosition.BottomRight;
+
+    private List<WCBToastOptions> _currentToasts = new();
+    private DotNetObjectReference<WCBToast>? _objRef;
+    private IJSObjectReference? _jsModule;
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += ShowToast;
+        ToastService.OnClearAll += ClearAllToasts;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Dynamically import the JS module
+                _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/WCB.Components/js/wcb-components.js");
+                _objRef = DotNetObjectReference.Create(this);
+            }
+            catch (JSException ex)
+            {
+                // Handle case where module cannot be found
+                Console.WriteLine($"Error importing JS module: {ex.Message}");
+            }
+        }
+    }
+
+    private void ShowToast(WCBToastOptions options)
+    {
+        InvokeAsync(async () =>
+        {
+            try
+            {
+                _currentToasts.Add(options);
+                StateHasChanged();
+
+                // Call the JS function on the imported module object
+                if (_jsModule != null)
+                {
+                    await _jsModule.InvokeVoidAsync("initToasts", _objRef);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding toast to list: {ex.Message}");
+            }
+        });
+    }
+
+    private void ClearAllToasts()
+    {
+        InvokeAsync(() =>
+        {
+            _currentToasts.Clear();
+            StateHasChanged();
+        });
+    }
+
+    [JSInvokable]
+    public void ToastHidden(string message)
+    {
+        InvokeAsync(() =>
+        {
+            _currentToasts.RemoveAll(t => t.Message == message);
+            StateHasChanged();
+        });
+    }
+
+    private string GetPositionClass()
+    {
+        return Position switch
+        {
+            WCBToastPosition.TopLeft => "top-0 start-0",
+            WCBToastPosition.TopCenter => "top-0 start-50 translate-middle-x",
+            WCBToastPosition.TopRight => "top-0 end-0",
+            WCBToastPosition.MiddleLeft => "top-50 start-0 translate-middle-y",
+            WCBToastPosition.MiddleCenter => "top-50 start-50 translate-middle",
+            WCBToastPosition.MiddleRight => "top-50 end-0 translate-middle-y",
+            WCBToastPosition.BottomLeft => "bottom-0 start-0",
+            WCBToastPosition.BottomCenter => "bottom-0 start-50 translate-middle-x",
+            _ => "bottom-0 end-0", // Default: BottomRight
+        };
+    }
+
+    private string GetIconClass(AlertType type)
+    {
+        return type switch
+        {
+            AlertType.Success => "bi bi-check-circle-fill",
+            AlertType.Warning => "bi bi-exclamation-triangle-fill",
+            AlertType.Error => "bi bi-x-circle-fill",
+            _ => "bi bi-info-circle", // Default: Info
+        };
+    }
+
+    private string GetTimeAgo(DateTimeOffset timestamp)
+    {
+        var timeSpan = DateTimeOffset.Now - timestamp;
+        if (timeSpan.TotalMinutes < 1)
+        {
+            return "zojuist";
+        }
+        if (timeSpan.TotalHours < 1)
+        {
+            var minutes = (int)timeSpan.TotalMinutes;
+            return $"{minutes} minuut{(minutes > 1 ? "en" : "")} geleden";
+        }
+        if (timeSpan.TotalDays < 1)
+        {
+            var hours = (int)timeSpan.TotalHours;
+            return $"{hours} uur{(hours > 1 ? "en" : "")} geleden";
+        }
+        var days = (int)timeSpan.TotalDays;
+        return $"{days} dag{(days > 1 ? "en" : "")} geleden";
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnShow -= ShowToast;
+        ToastService.OnClearAll -= ClearAllToasts;
+        _objRef?.Dispose();
+        _jsModule?.DisposeAsync();
+    }
+}

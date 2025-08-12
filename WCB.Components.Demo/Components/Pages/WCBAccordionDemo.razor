@@ -1,0 +1,222 @@
+﻿@page "/wcb-accordion-demo"
+@using WCB.Components.Components
+
+<link href="_content/WCB.Components/css/wcb-components.css" rel="stylesheet" />
+
+<h3>WCBAccordion Demo Pagina</h3>
+<p>
+    Uitgebreide demonstratie van de <code>WCBAccordion</code> en <code>WCBAccordionItem</code> componenten
+    met WCB custom styling en verschillende configuraties.
+</p>
+
+<div class="mb-4">
+    <h4>WCB Styled Accordion</h4>
+    <WCBAccordion CssClass="mb-3">
+        <WCBAccordionItem IsCollapsed="false" UseWcbStyling="true">
+            <Header>
+                <strong> Over WCB Styling</strong>
+            </Header>
+            <Content>
+                <p>
+                    Deze accordion gebruikt de custom WCB styling met de donkerblauwe header (#001C3D).
+                    De styling wordt automatisch toegepast via de <code>UseWcbStyling="true"</code> parameter.
+                </p>
+                <div class="alert alert-info">
+                    <strong>Tip:</strong> Dit item gebruikt de standaard WCB kleuren en styling.
+                </div>
+            </Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem UseWcbStyling="true">
+            <Header>
+                <strong>Features van WCB Styling</strong>
+            </Header>
+            <Content>
+                <ul>
+                    <li><strong>Donkerblauwe headers</strong> (#001C3D) voor consistentie</li>
+                    <li><strong>Witte tekst</strong> voor goede leesbaarheid</li>
+                    <li><strong>Hover effecten</strong> voor betere gebruikerservaring</li>
+                    <li><strong>Focus states</strong> voor toegankelijkheid</li>
+                    <li><strong>Afgeronde hoeken</strong> voor moderne uitstraling</li>
+                </ul>
+            </Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem UseWcbStyling="true" HeaderCssClass="wcb-success">
+            <Header>
+                <strong>Succes Variant</strong>
+            </Header>
+            <Content>
+                <p>Dit item gebruikt een groene header via de <code>HeaderCssClass="wcb-success"</code> parameter.</p>
+                <div class="alert alert-success">
+                    Je kunt verschillende WCB kleuren combineren met de custom styling!
+                </div>
+            </Content>
+        </WCBAccordionItem>
+    </WCBAccordion>
+</div>
+
+<div class="mb-4">
+    <h4> Kleur Variaties</h4>
+    <WCBAccordion>
+        <WCBAccordionItem UseWcbStyling="true" HeaderCssClass="wcb-primary">
+            <Header><strong>Primaire Kleur</strong></Header>
+            <Content>Deze gebruikt de wcb-primary kleur variant.</Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem UseWcbStyling="true" HeaderCssClass="wcb-warning">
+            <Header><strong>Waarschuwing Kleur</strong></Header>
+            <Content>Deze gebruikt de wcb-warning kleur variant.</Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem UseWcbStyling="true" HeaderCssClass="wcb-danger">
+            <Header><strong>Gevaar Kleur</strong></Header>
+            <Content>Deze gebruikt de wcb-danger kleur variant.</Content>
+        </WCBAccordionItem>
+    </WCBAccordion>
+</div>
+
+<div class="mb-4">
+    <h4> Vergelijking: WCB vs Bootstrap Styling</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Met WCB Styling</h5>
+            <WCBAccordion>
+                <WCBAccordionItem UseWcbStyling="true" HeaderText="WCB Styled Header">
+                    <Content>
+                        <p>Deze accordion gebruikt WCB custom styling:</p>
+                        <ul>
+                            <li>Donkerblauwe achtergrond</li>
+                            <li>Witte tekst</li>
+                            <li>Custom hover effecten</li>
+                        </ul>
+                    </Content>
+                </WCBAccordionItem>
+            </WCBAccordion>
+        </div>
+        <div class="col-md-6">
+            <h5>Standaard Bootstrap</h5>
+            <WCBAccordion>
+                <WCBAccordionItem UseWcbStyling="false" HeaderText="Bootstrap Styled Header">
+                    <Content>
+                        <p>Deze accordion gebruikt standaard Bootstrap styling:</p>
+                        <ul>
+                            <li>Standaard grijze achtergrond</li>
+                            <li>Donkere tekst</li>
+                            <li>Bootstrap hover effecten</li>
+                        </ul>
+                    </Content>
+                </WCBAccordionItem>
+            </WCBAccordion>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h4>Interactieve Demo - Met WCB Styling</h4>
+    <div class="mb-3">
+        <button class="btn btn-primary btn-sm me-2" @onclick="ExpandAll">Alles Openen</button>
+        <button class="btn btn-secondary btn-sm me-2" @onclick="CollapseAll">Alles Sluiten</button>
+        <button class="btn btn-info btn-sm" @onclick="ToggleFirst">Toggle Eerste</button>
+    </div>
+
+    <WCBAccordion @ref="InteractiveAccordion">
+        <WCBAccordionItem @ref="FirstItem" OnToggle="OnFirstItemToggle" UseWcbStyling="true">
+            <Header>
+                <span class="d-flex justify-content-between align-items-center w-100">
+                    <strong>Programmisch Bestuurbaar</strong>
+                    <span class="badge bg-@(firstItemOpen ? "success" : "light") text-@(firstItemOpen ? "white" : "dark")">
+                        @(firstItemOpen ? "Open" : "Gesloten")
+                    </span>
+                </span>
+            </Header>
+            <Content>
+                <p>Dit item gebruikt WCB styling en kan programmatisch worden bestuurd.</p>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> Dit item is momenteel <strong>@(firstItemOpen ? "OPEN" : "GESLOTEN")</strong>
+                </div>
+            </Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem @ref="SecondItem" UseWcbStyling="true" HeaderCssClass="wcb-primary">
+            <Header>
+                <strong> Met Primaire Kleur</strong>
+            </Header>
+            <Content>
+                <p>Dit item combineert WCB styling met de primaire kleur variant.</p>
+                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                    <strong>Mooie styling combinaties mogelijk!</strong>
+                </div>
+            </Content>
+        </WCBAccordionItem>
+
+        <WCBAccordionItem @ref="ThirdItem" Disabled="@disableThirdItem" UseWcbStyling="true" HeaderCssClass="wcb-secondary">
+            <Header>
+                <span class="d-flex justify-content-between align-items-center w-100">
+                    <span>In/Uitschakelbaar</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox"
+                               @bind="disableThirdItem" @onclick:stopPropagation="true">
+                        <label class="form-check-label text-white">Uitgeschakeld</label>
+                    </div>
+                </span>
+            </Header>
+            <Content>
+                <p>Dit item kan worden in- en uitgeschakeld en gebruikt secundaire WCB kleuren.</p>
+                <div class="alert alert-warning">
+                    <strong>Tip:</strong> Klik op de switch om dit item uit te schakelen.
+                </div>
+            </Content>
+        </WCBAccordionItem>
+    </WCBAccordion>
+</div>
+
+<div class="mb-4">
+    <h4>Status Overzicht</h4>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Eerste Item:</strong> @(firstItemOpen ? "Open" : "Gesloten")</p>
+            <p><strong>Derde Item:</strong> @(disableThirdItem ? " Uitgeschakeld" : " Ingeschakeld")</p>
+            <p class="mb-0"><strong>Laatste Toggle:</strong> @lastToggleTime</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    // References naar accordion items voor programmische besturing
+    private WCBAccordionItem? FirstItem;
+    private WCBAccordionItem? SecondItem;
+    private WCBAccordionItem? ThirdItem;
+    private WCBAccordion? InteractiveAccordion;
+
+    // State tracking
+    private bool firstItemOpen = false;
+    private bool disableThirdItem = false;
+    private string lastToggleTime = "Nog niet getoggled";
+
+    private void ExpandAll()
+    {
+        FirstItem?.Expand();
+        SecondItem?.Expand();
+        if (!disableThirdItem) ThirdItem?.Expand();
+    }
+
+    private void CollapseAll()
+    {
+        FirstItem?.Collapse();
+        SecondItem?.Collapse();
+        if (!disableThirdItem) ThirdItem?.Collapse();
+    }
+
+    private void ToggleFirst()
+    {
+        FirstItem?.Toggle();
+    }
+
+    private void OnFirstItemToggle(bool isCollapsed)
+    {
+        firstItemOpen = !isCollapsed;
+        lastToggleTime = DateTime.Now.ToString("HH:mm:ss");
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,30 @@
+﻿@typeparam TItem
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            @foreach (var column in Columns)
+            {
+                <th>@column.Header</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                @foreach (var column in Columns)
+                {
+                    <td>@column.CellTemplate(item)</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();
+    [Parameter] public List<ColumnDefinition<TItem>> Columns { get; set; } = new();
+    
+   
+}

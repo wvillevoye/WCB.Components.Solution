@@ -1,0 +1,56 @@
+﻿@page "/wcb-datatablewithpagination-demo"
+
+<h3>Boeken Catalogus</h3>
+
+<WCBDataTableWithPagination TItem="Boek"
+                            Items="Boeken"
+                            Columns="BoekColumns"
+                            PageSize="5" />
+
+@code {
+    public record Boek(string Titel, int Jaar, string Publisher, string Auteur);
+
+    private List<Boek> Boeken = new();
+    private List<ColumnDefinition<Boek>> BoekColumns;
+
+    protected override void OnInitialized()
+    {
+        Boeken = new()
+        {
+            new("De ontdekking van de hemel", 1992, "De Bezige Bij", "Harry Mulisch"),
+            new("Het diner", 2009, "Anthos", "Herman Koch"),
+            new("Joe Speedboot", 2005, "De Bezige Bij", "Tommy Wieringa"),
+            new("Publieke werken", 1999, "Querido", "Thomas Rosenboom"),
+            new("Het pauperparadijs", 2016, "Atlas Contact", "Suzanna Jansen"),
+            new("Zondagskind", 2018, "Lebowski", "Judith Visser"),
+            new("De meeste mensen deugen", 2019, "De Correspondent", "Rutger Bregman"),
+            new("Het huis van de moskee", 2005, "De Bezige Bij", "Kader Abdolah"),
+            new("Knielen op een bed violen", 2005, "De Bezige Bij", "Jan Siebelink"),
+            new("Het smelt", 2016, "Das Mag", "Lize Spit"),
+            new("Bonita Avenue", 2010, "De Bezige Bij", "Peter Buwalda"),
+            new("De heilige Rita", 2017, "De Bezige Bij", "Tommy Wieringa"),
+            new("Dit zijn de namen", 2012, "De Bezige Bij", "Tommy Wieringa"),
+            new("Lampje", 2017, "Querido", "Annet Schaap"),
+            new("Het zoutpad", 2018, "Balans", "Raynor Winn"),
+            new("De avond is ongemak", 2018, "Atlas Contact", "Marieke Lucas Rijneveld"),
+            new("Het achtste leven", 2014, "De Geus", "Nino Haratischwili"),
+            new("Mijn lieve gunsteling", 2020, "Atlas Contact", "Marieke Lucas Rijneveld"),
+            new("De tolk van Java", 2016, "Atlas Contact", "Alfred Birney"),
+            new("De stamhouder", 2021, "De Bezige Bij", "Alexander Münninghoff"),
+        };
+
+
+
+
+        BoekColumns = new()
+        {
+            ColumnBuilder.CreateColumn<Boek, string>("Titel", b => b.Titel),
+            ColumnBuilder.CreateColumn<Boek, int>("Jaar", b => b.Jaar),
+            ColumnBuilder.CreateColumn<Boek, string>("Uitgever", b => b.Publisher, false),
+            ColumnBuilder.CreateColumn<Boek, string>("Auteur", b => b.Auteur)
+        };
+
+
+
+    }
+}

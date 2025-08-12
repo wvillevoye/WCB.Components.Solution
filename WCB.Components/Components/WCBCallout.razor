@@ -1,0 +1,73 @@
+﻿@using WCB.Components.Services.Shared
+<div class="alert alert-@GetAlertTypeClass() @(Dismissible ? "alert-dismissible fade show" : "") alert-border-left @GetBorderColorClass()" role="alert">
+    @if (!string.IsNullOrEmpty(GetIconClassForType()))
+    {
+        <i class="@GetIconClassForType() me-2"></i>
+    }
+    @Message
+    @if (Dismissible)
+    {
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// De tekstinhoud van de callout.
+    /// </summary>
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Het type callout (bijv. Info, Success, Warning, Error) om de kleur te bepalen.
+    /// Hergebruikt AlertType voor consistentie.
+    /// </summary>
+    [Parameter]
+    public AlertType Type { get; set; } = AlertType.Info; // Type is nu AlertType
+
+    /// <summary>
+    /// Geeft aan of de callout een sluitknop heeft.
+    /// </summary>
+    [Parameter]
+    public bool Dismissible { get; set; } = false;
+
+    /// <summary>
+    /// Bepaalt de Bootstrap alert klasse op basis van het opgegeven type.
+    /// </summary>
+    /// <returns>De corresponderende Bootstrap alert klasse string.</returns>
+    private string GetAlertTypeClass()
+    {
+        return Type switch
+        {
+            AlertType.Success => "success",
+            AlertType.Warning => "warning",
+            AlertType.Error => "danger",
+            _ => "info", // Standaard info
+        };
+    }
+    private string GetBorderColorClass()
+    {
+        return Type switch
+        {
+            AlertType.Success => "alert-border-left-success",
+            AlertType.Warning => "alert-border-left-warning",
+            AlertType.Error => "alert-border-left-danger",
+            _ => "alert-border-left-info"
+        };
+    }
+    /// <summary>
+    /// Bepaalt de Bootstrap Icon klasse op basis van het Callout Type.
+    /// </summary>
+    /// <returns>De corresponderende Bootstrap Icon klasse string.</returns>
+    private string? GetIconClassForType()
+    {
+        return Type switch
+        {
+            AlertType.Info => "bi bi-info-circle", // Type is nu AlertType
+            AlertType.Success => "bi bi-check-circle-fill",
+            AlertType.Warning => "bi bi-exclamation-triangle-fill",
+            AlertType.Error => "bi bi-x-circle-fill",
+            _ => null // Geen icoon voor onbekende types
+        };
+    }
+}

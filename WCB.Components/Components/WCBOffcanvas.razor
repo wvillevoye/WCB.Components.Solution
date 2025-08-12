@@ -1,0 +1,102 @@
+﻿@using WCB.Components.Services
+@using WCB.Components.Services.WCBOffcanvas
+@inject WCBOffcanvasService OffcanvasService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="@_offcanvasClasses" tabindex="-1" id="wcb-offcanvas" aria-labelledby="wcb-offcanvas-label">
+    <div class="offcanvas-header wcb-offcanvas-header">
+        <h5 class="offcanvas-title" id="wcb-offcanvas-label">@_options.Title</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        @_options.BodyContent
+    </div>
+</div>
+
+@code {
+    private WCBOffcanvasOptions _options = new WCBOffcanvasOptions();
+    private IJSObjectReference? _jsModule;
+    private string _offcanvasClasses = "offcanvas offcanvas-start";
+
+    protected override void OnInitialized()
+    {
+        OffcanvasService.OnShow += ShowOffcanvas;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/WCB.Components/js/wcb-components.js");
+            }
+            catch (JSException ex)
+            {
+                Console.WriteLine($"Error importing JS module: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task ShowOffcanvas(WCBOffcanvasOptions options)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                _options = options;
+                _offcanvasClasses = GetOffcanvasClasses();
+                StateHasChanged();
+                await Task.Delay(100); // Geef de DOM tijd om bij te werken
+                await Show();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error showing offcanvas: {ex.Message}");
+            }
+        });
+    }
+
+    private async Task Show()
+    {
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("showOffcanvas", "wcb-offcanvas");
+            
+        }
+    }
+
+    public void Dispose()
+    {
+        OffcanvasService.OnShow -= ShowOffcanvas;
+        _jsModule?.DisposeAsync();
+    }
+
+    private string GetOffcanvasClasses()
+    {
+        return $"offcanvas {GetPositionClass()} {GetSizeClass()}";
+    }
+
+    private string GetPositionClass()
+    {
+        return _options.Position switch
+        {
+            WCBOffcanvasPosition.End => "offcanvas-end",
+            WCBOffcanvasPosition.Top => "offcanvas-top",
+            WCBOffcanvasPosition.Bottom => "offcanvas-bottom",
+            _ => "offcanvas-start" // Default: Start
+        };
+    }
+
+    private string GetSizeClass()
+    {
+        return _options.Size switch
+        {
+            WCBOffcanvasSize.Small => "wcb-offcanvas-sm",
+            WCBOffcanvasSize.Large => "wcb-offcanvas-lg",
+            WCBOffcanvasSize.Medium => "wcb-offcanvas-md",
+            _ => string.Empty // Default: Geen extra klasse voor normale grootte
+        };
+    }
+}

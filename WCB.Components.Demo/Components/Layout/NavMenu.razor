@@ -1,0 +1,55 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">WCB.Components.Demo</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <WCBTree TNode="MenuItem"
+                 Nodes="menuItems"
+                 GetLabel="node => node.Label"
+                 GetIconClass="node => node.IconClass"
+                 GetHref="node => node.Href"
+                 GetChildren="node => node.Children" />
+
+    </nav>
+</div>
+@code {
+    private List<MenuItem>? menuItems;
+
+    private List<MenuItem> flatMenuItems = new()
+    {
+        new MenuItem { Id = 1, Label = "Home", IconClass = "bi bi-house-door-fill", Href = "/" },
+
+        new MenuItem { Id = 2, Label = "Data ", IconClass = "bi bi-x-diamond", Href = "#" },
+        new MenuItem { Id = 3, ParentId = 2, Label = "Pagination Demo", IconClass = "bi bi-database", Href = "wcb-pagination-demo" },
+        new MenuItem { Id = 4, ParentId = 2, Label = "Pagination Table Demo", IconClass = "bi bi-database", Href = "wcb-datatablewithpagination-demo" },
+        new MenuItem { Id = 5, ParentId = 2, Label = "Api Table Demo", IconClass = "bi bi-database", Href = "wcb-apipaginationtable-demo" },
+        //Components
+        new MenuItem { Id = 6, Label = "Components ", IconClass = "bi bi-x-diamond", Href = "#" },
+        new MenuItem { Id = 7,ParentId = 6,  Label = "Toast Demo", IconClass = "bi bi-x-diamond", Href = "toast" },
+        new MenuItem { Id = 8,ParentId = 6,  Label = "Callout Demo", IconClass = "bi bi-x-diamond", Href = "callout-demo" },
+        new MenuItem { Id = 9,ParentId = 6,  Label = "Modal Demo", IconClass = "bi bi-x-diamond", Href = "modal-demo" },
+        new MenuItem { Id = 10,ParentId = 6,  Label = "Accordion-Demoo", IconClass = "bi bi-x-diamond", Href = "wcb-accordion-demo" },
+        new MenuItem { Id = 11,ParentId = 6,  Label = "Offcanvas Demo", IconClass = "bi bi-x-diamond", Href = "offcanvas-demo" },
+        new MenuItem { Id = 12,ParentId = 6,  Label = "Tabs Demo", IconClass = "bi bi-x-diamond", Href = "wcb-tabs-demo" },
+        new MenuItem { Id = 13,ParentId = 6,  Label = "Spinner Demo", IconClass = "bi bi-x-diamond", Href = "wcb-spinner-demo" },
+        new MenuItem { Id = 14,ParentId = 6,  Label = "Tree Demo", IconClass = "bi bi-x-diamond", Href = "wcb-tree-demo" },
+        //Forms
+        new MenuItem { Id = 15, Label = "Forms ", IconClass = "bi bi-code-square", Href = "#" },
+        new MenuItem { Id = 16, ParentId = 15, Label = "Select Demo", IconClass = "bi bi-code-square", Href = "input-select-demo" },
+        new MenuItem { Id = 17, ParentId = 15, Label = "Checkboxlist Demo", IconClass = "bi bi-code-square", Href = "wcb-checkbox-list-demo" },
+        new MenuItem { Id = 18, ParentId = 15, Label = "Radio list Demo", IconClass = "bi bi-code-square", Href = "wcb-radiogroup-demo" },
+        new MenuItem { Id = 19, ParentId = 15, Label = "Switch Demo", IconClass = "bi bi-code-square", Href = "wcb-switch-demo" },
+        new MenuItem { Id = 20, ParentId = 15, Label = "DatePicker Demo", IconClass = "bi bi-code-square", Href = "wcb-DatePicker-Demo" },
+
+    };
+
+    protected override void OnInitialized()
+    {
+        menuItems = MenuHelper.BuildTree(flatMenuItems);
+    }
+}

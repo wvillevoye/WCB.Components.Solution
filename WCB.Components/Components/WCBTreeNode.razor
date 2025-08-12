@@ -1,0 +1,56 @@
+﻿@typeparam TItem
+
+<li class="list-group-item p-1 d-flex align-items-center" style="cursor:pointer;">
+    @if (HasChildren)
+    {
+        <button class="btn btn-sm btn-link p-0 " onclick="@Toggle">
+            <i class=" bi @(IsExpanded ? "bi-caret-down-fill" : "bi-caret-right-fill")"></i>
+        </button>
+    }
+    else
+    {
+        <span class="me-4"></span>
+    }
+
+    <span class="flex-grow-1 @(IsSelected ? "fw-bold text-primary" : "")" onclick="@(() => SelectNode())">
+        @GetText(Node)
+    </span>
+</li>
+
+@if (HasChildren && IsExpanded)
+{
+    <ul class="list-group list-group-flush ps-4">
+        @foreach (var child in GetChildren(Node))
+        {
+            <WCBTreeNode TItem="TItem"
+                         Node="child"
+                         GetChildren="GetChildren"
+                         GetText="GetText"
+                         SelectedNode="SelectedNode"
+                         OnSelected="OnSelected" />
+        }
+    </ul>
+}
+
+@code {
+    [Parameter] public TItem Node { get; set; } = default!;
+    [Parameter] public Func<TItem, List<TItem>> GetChildren { get; set; } = _ => new List<TItem>();
+    [Parameter] public Func<TItem, string> GetText { get; set; } = _ => "";
+    [Parameter] public TItem? SelectedNode { get; set; }
+    [Parameter] public EventCallback<TItem> OnSelected { get; set; }
+
+    private bool IsExpanded { get; set; }
+    private bool HasChildren => GetChildren(Node).Any();
+    private bool IsSelected => EqualityComparer<TItem>.Default.Equals(Node, SelectedNode);
+
+    private void Toggle()
+    {
+        IsExpanded = !IsExpanded;
+    }
+
+    private async Task SelectNode()
+    {
+        if (OnSelected.HasDelegate)
+            await OnSelected.InvokeAsync(Node);
+    }
+}

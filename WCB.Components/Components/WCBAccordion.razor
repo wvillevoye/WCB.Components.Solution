@@ -1,0 +1,46 @@
+﻿@*
+    WCBAccordion.razor
+    Hoofdcomponent die als container dient voor WCBAccordionItem componenten.
+    Zorgt voor de juiste Bootstrap accordion structuur.
+*@
+
+<div class="accordion @CssClass" id="@AccordionId">
+    <CascadingValue Value="AccordionId">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    /// <summary>
+    /// Een unieke ID voor de accordion container.
+    /// Dit wordt gebruikt door de child items voor Bootstrap's collapse functionaliteit.
+    /// </summary>
+    private string AccordionId { get; set; } = $"accordion_{Guid.NewGuid().ToString("N")[..8]}";
+
+    /// <summary>
+    /// De ChildContent parameter vangt alle WCBAccordionItem componenten op.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Optionele CSS-klasse voor extra styling van de accordion container.
+    /// </summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// Bepaalt of slechts één item tegelijk open kan zijn (Bootstrap accordion gedrag).
+    /// </summary>
+    [Parameter]
+    public bool AllowMultipleOpen { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        // Als multiple open is toegestaan, verwijder de data-bs-parent restrictie
+        if (AllowMultipleOpen)
+        {
+            // Dit wordt afgehandeld in de WCBAccordionItem component
+        }
+    }
+}

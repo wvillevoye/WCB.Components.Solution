@@ -1,0 +1,106 @@
+﻿@* Bestand: WCB.Components/Components/WCBModal/WCBModal.razor *@
+@* This component renders and manages a Bootstrap Modal. *@
+@using WCB.Components.Services
+@using WCB.Components.Services.WCBModal
+@inject WCBModalService ModalService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@(ModalId + "Label")" aria-hidden="true">
+    <div class="modal-dialog @ModalOptions.Size">
+        <div class="modal-content">
+            <div class="modal-header wcb-modal-header">
+                <h5 class="modal-title" id="@(ModalId + "Label")">@ModalOptions.Title</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ModalOptions.BodyContent
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string ModalId { get; set; } = Guid.NewGuid().ToString();
+    private WCBModalOptions ModalOptions { get; set; } = new WCBModalOptions();
+    private bool _modalShown;
+    private IJSObjectReference? _jsModule;
+
+    protected override void OnInitialized()
+    {
+        ModalService.OnShow += ShowModal;
+        ModalService.OnHide += HideModal;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Dynamically import the JS module
+                _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/WCB.Components/js/wcb-components.js");
+            }
+            catch (JSException ex)
+            {
+                // Handle case where module cannot be found
+                Console.WriteLine($"Error importing JS module: {ex.Message}");
+            }
+        }
+    }
+
+    private async void ShowModal(WCBModalOptions options)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                ModalOptions = options;
+                StateHasChanged();
+                await Task.Delay(100); // Give the DOM time to update
+                await Show();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error showing modal: {ex.Message}");
+            }
+        });
+    }
+
+    private async void HideModal()
+    {
+        await InvokeAsync(async () =>
+        {
+            await Hide();
+        });
+    }
+
+    private async Task Show()
+    {
+        // Call the JS function on the imported module object
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("showModal", ModalId);
+            _modalShown = true;
+        }
+    }
+
+    private async Task Hide()
+    {
+        if (_modalShown && _jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("hideModal", ModalId);
+            _modalShown = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        ModalService.OnShow -= ShowModal;
+        ModalService.OnHide -= HideModal;
+        _jsModule?.DisposeAsync();
+    }
+}

@@ -1,0 +1,148 @@
+﻿@page "/wcb-pagination-demo"
+@using System.Linq
+
+
+<h2>Boeken Catalogus</h2>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Titel</th>
+            <th>Jaar</th>
+            <th>Uitgever</th>
+            <th>Auteur</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var boek in GetBoekenPage())
+        {
+            var auteur = auteurs.First(a => a.Id == boek.AuteurId);
+            <tr>
+                <td>@boek.Titel</td>
+                <td>@boek.Jaar</td>
+                <td>@boek.Publisher</td>
+                <td>@auteur.Voornaam @auteur.Achternaam</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<WCBPagination ListId="boeken"
+               TotalItems="@boeken.Count"
+               PageSize="5"
+               CurrentPage="@boekenPage"
+               OnPageChanged="LoadBoeken"
+               MaxVisiblePages="5" />
+
+<hr />
+
+<h2>Auteurs</h2>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Voornaam</th>
+            <th>Achternaam</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var auteur in GetAuteursPage())
+        {
+            <tr>
+                <td>@auteur.Voornaam</td>
+                <td>@auteur.Achternaam</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<WCBPagination ListId="auteurs"
+               TotalItems="@auteurs.Count"
+               PageSize="5"
+               CurrentPage="@auteursPage"
+               OnPageChanged="LoadAuteurs"
+               MaxVisiblePages="5" />
+
+@code {
+    private List<Boek> boeken = new();
+    private List<Auteur> auteurs = new();
+
+    private int boekenPage = 1;
+    private int auteursPage = 1;
+
+    protected override void OnInitialized()
+    {
+        auteurs = new List<Auteur>
+        {
+            new() { Id = 1, Voornaam = "George", Achternaam = "Orwell" },
+            new() { Id = 2, Voornaam = "Jane", Achternaam = "Austen" },
+            new() { Id = 3, Voornaam = "Mark", Achternaam = "Twain" },
+            new() { Id = 4, Voornaam = "Harper", Achternaam = "Lee" },
+            new() { Id = 5, Voornaam = "F. Scott", Achternaam = "Fitzgerald" },
+            new() { Id = 6, Voornaam = "J.K.", Achternaam = "Rowling" },
+            new() { Id = 7, Voornaam = "Ernest", Achternaam = "Hemingway" },
+            new() { Id = 8, Voornaam = "Mary", Achternaam = "Shelley" },
+            new() { Id = 9, Voornaam = "Leo", Achternaam = "Tolstoy" },
+            new() { Id = 10, Voornaam = "Charles", Achternaam = "Dickens" },
+            new() { Id = 11, Voornaam = "J.R.R.", Achternaam = "Tolkien" },
+            new() { Id = 12, Voornaam = "Agatha", Achternaam = "Christie" },
+            new() { Id = 13, Voornaam = "Herman", Achternaam = "Melville" },
+            new() { Id = 14, Voornaam = "Arthur", Achternaam = "Conan Doyle" },
+            new() { Id = 15, Voornaam = "Oscar", Achternaam = "Wilde" },
+            new() { Id = 16, Voornaam = "Virginia", Achternaam = "Woolf" },
+            new() { Id = 17, Voornaam = "Bram", Achternaam = "Stoker" },
+            new() { Id = 18, Voornaam = "Jack", Achternaam = "London" },
+            new() { Id = 19, Voornaam = "John", Achternaam = "Steinbeck" },
+            new() { Id = 20, Voornaam = "C.S.", Achternaam = "Lewis" }
+        };
+
+        boeken = new List<Boek>
+        {
+            new() { Id = 1, Titel = "1984", Jaar = 1949, Publisher = "Secker & Warburg", AuteurId = 1 },
+            new() { Id = 2, Titel = "Pride and Prejudice", Jaar = 1813, Publisher = "T. Egerton", AuteurId = 2 },
+            new() { Id = 3, Titel = "Adventures of Huckleberry Finn", Jaar = 1884, Publisher = "Chatto & Windus", AuteurId = 3 },
+            new() { Id = 4, Titel = "To Kill a Mockingbird", Jaar = 1960, Publisher = "J.B. Lippincott & Co.", AuteurId = 4 },
+            new() { Id = 5, Titel = "The Great Gatsby", Jaar = 1925, Publisher = "Charles Scribner's Sons", AuteurId = 5 },
+            new() { Id = 6, Titel = "Harry Potter and the Philosopher's Stone", Jaar = 1997, Publisher = "Bloomsbury", AuteurId = 6 },
+            new() { Id = 7, Titel = "The Old Man and the Sea", Jaar = 1952, Publisher = "Charles Scribner's Sons", AuteurId = 7 },
+            new() { Id = 8, Titel = "Frankenstein", Jaar = 1818, Publisher = "Lackington, Hughes, Harding, Mavor & Jones", AuteurId = 8 },
+            new() { Id = 9, Titel = "War and Peace", Jaar = 1869, Publisher = "The Russian Messenger", AuteurId = 9 },
+            new() { Id = 10, Titel = "A Tale of Two Cities", Jaar = 1859, Publisher = "Chapman & Hall", AuteurId = 10 },
+            new() { Id = 11, Titel = "The Hobbit", Jaar = 1937, Publisher = "George Allen & Unwin", AuteurId = 11 },
+            new() { Id = 12, Titel = "Murder on the Orient Express", Jaar = 1934, Publisher = "Collins Crime Club", AuteurId = 12 },
+            new() { Id = 13, Titel = "Moby-Dick", Jaar = 1851, Publisher = "Harper & Brothers", AuteurId = 13 },
+            new() { Id = 14, Titel = "The Hound of the Baskervilles", Jaar = 1902, Publisher = "George Newnes", AuteurId = 14 },
+            new() { Id = 15, Titel = "The Picture of Dorian Gray", Jaar = 1890, Publisher = "Lippincott's Monthly Magazine", AuteurId = 15 },
+            new() { Id = 16, Titel = "Mrs Dalloway", Jaar = 1925, Publisher = "Hogarth Press", AuteurId = 16 },
+            new() { Id = 17, Titel = "Dracula", Jaar = 1897, Publisher = "Archibald Constable and Company", AuteurId = 17 },
+            new() { Id = 18, Titel = "The Call of the Wild", Jaar = 1903, Publisher = "Macmillan", AuteurId = 18 },
+            new() { Id = 19, Titel = "The Grapes of Wrath", Jaar = 1939, Publisher = "The Viking Press", AuteurId = 19 },
+            new() { Id = 20, Titel = "The Lion, the Witch and the Wardrobe", Jaar = 1950, Publisher = "Geoffrey Bles", AuteurId = 20 }
+        };
+    }
+
+    private IEnumerable<Boek> GetBoekenPage() =>
+        boeken.Skip((boekenPage - 1) * 5).Take(5);
+
+    private IEnumerable<Auteur> GetAuteursPage() =>
+        auteurs.Skip((auteursPage - 1) * 5).Take(5);
+
+    private void LoadBoeken(int page) => boekenPage = page;
+    private void LoadAuteurs(int page) => auteursPage = page;
+
+    public class Boek
+    {
+        public int Id { get; set; }
+        public string Titel { get; set; }
+        public int Jaar { get; set; }
+        public string Publisher { get; set; }
+        public int AuteurId { get; set; }
+    }
+
+    public class Auteur
+    {
+        public int Id { get; set; }
+        public string Voornaam { get; set; }
+        public string Achternaam { get; set; }
+    }
+}

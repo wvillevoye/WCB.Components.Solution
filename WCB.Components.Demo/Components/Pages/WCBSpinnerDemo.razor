@@ -1,0 +1,37 @@
+﻿@page "/wcb-spinner-demo"
+<PageTitle>Spinner Demo</PageTitle>
+
+<h3>Blazor Spinner Demo</h3>
+
+<p>Klik op de knop om een laadproces te starten en de spinner te tonen.</p>
+
+<button class="btn btn-primary" @onclick="StartLoading">Start Laden</button>
+
+@if (IsLoading)
+{
+    <div class="mt-4" style="height: 100px;">
+        <WCBSpinner  Type="WCBSpinner.SpinnerType.Bar"/>
+    </div>
+    
+    <div class="mt-4 alert alert-info">
+        Laden... Een gesimuleerd proces is bezig.
+    </div>
+}
+else
+{
+    <div class="mt-4 alert alert-success">
+        Klaar!
+    </div>
+}
+
+@code {
+    private bool IsLoading { get; set; }
+
+    private async Task StartLoading()
+    {
+        IsLoading = true;
+        // Simuleer een langlopende taak
+        await Task.Delay(3000); 
+        IsLoading = false;
+    }
+}

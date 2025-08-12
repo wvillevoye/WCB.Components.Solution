@@ -1,0 +1,73 @@
+﻿@page "/wcb-checkbox-list-demo"
+@using WCB.Components.Components
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+
+
+<h3>WCBCheckboxList Demo</h3>
+<p>Deze pagina demonstreert de <code>WCBCheckboxList</code> component.</p>
+
+<EditForm Model="SelectedModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="faculteitCheckboxes" class="form-label">Kies faculteiten:</label>
+        <WCBCheckboxList TItem="FaculteitDto" TValue="int"
+                         Items="Faculteiten"
+                         @bind-SelectedValues="SelectedModel.SelectedFaculteitIds"
+                         GetDisplayValue="fac => fac.Name"
+                         GetValue="fac => fac.Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verzenden</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_resultMessage))
+{
+    <div class="alert alert-info mt-3" role="alert">
+        @_resultMessage
+    </div>
+}
+
+@code {
+    // Voorbeeld data voor de generieke component
+    public class FaculteitDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private List<FaculteitDto> Faculteiten = new List<FaculteitDto>
+    {
+        new FaculteitDto { Id = 1, Name = "Gedrags- en Maatschappijwetenschappen" },
+        new FaculteitDto { Id = 2, Name = "Rechtsgeleerdheid" },
+        new FaculteitDto { Id = 3, Name = "Medische Wetenschappen" },
+        new FaculteitDto { Id = 4, Name = "Letteren" }
+    };
+
+    private CheckboxDemoModel SelectedModel = new CheckboxDemoModel();
+    private string? _resultMessage;
+
+    /// <summary>
+    /// Methode die wordt aangeroepen bij een succesvolle validatie van het formulier.
+    /// </summary>
+    private void HandleValidSubmit()
+    {
+        var selectedFaculteiten = Faculteiten
+            .Where(f => SelectedModel.SelectedFaculteitIds.Contains(f.Id))
+            .Select(f => f.Name);
+        var faculteitenString = string.Join(", ", selectedFaculteiten);
+
+        _resultMessage = $"Geselecteerde Faculteiten: {faculteitenString}";
+    }
+
+    /// <summary>
+    /// Model voor de demo om formulierwaarden te binden en te valideren.
+    /// </summary>
+    public class CheckboxDemoModel
+    {
+        [Required(ErrorMessage = "Selecteer ten minste één faculteit")]
+        public List<int> SelectedFaculteitIds { get; set; } = new List<int>();
+    }
+}

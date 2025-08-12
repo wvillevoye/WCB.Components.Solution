@@ -1,0 +1,46 @@
+﻿@page "/toast"
+@using WCB.Components.Services.Shared
+@using WCB.Components.Services.WCBToast
+ 
+
+@inject WCBToastService ToastService  
+<PageTitle>ToastDemo</PageTitle>
+
+<h1>Toast!</h1>
+
+<p>Klik op de knoppen om verschillende soorten toasts te tonen.</p>
+
+<div class="d-flex gap-2">
+    <button class="btn btn-primary" @onclick="ShowInfoToast">Toon Info Toast</button>
+    <button class="btn btn-success" @onclick="ShowSuccessToast">Toon Succes Toast</button>
+    <button class="btn btn-warning" @onclick="ShowWarningToast">Toon Waarschuwing Toast</button>
+    <button class="btn btn-danger" @onclick="ShowErrorToast">Toon Fout Toast</button>
+    <button class="btn btn-secondary" @onclick="ClearAllToasts">Verberg Alle Toasts</button>
+</div>
+
+@code {
+    private void ShowInfoToast()
+    {
+        ToastService.ShowToast("Dit is een informatiemelding.", "Info", AlertType.Info);
+    }
+
+    private void ShowSuccessToast()
+    {
+        ToastService.ShowToast("Operatie succesvol voltooid!", "Succes!", AlertType.Success, 3000); // Kortere vertraging
+    }
+
+    private void ShowWarningToast()
+    {
+        ToastService.ShowToast("Er is een waarschuwing opgetreden.", "Waarschuwing", AlertType.Warning);
+    }
+
+    private void ShowErrorToast()
+    {
+        ToastService.ShowToast("Er is een onverwachte fout opgetreden.", "Fout!", AlertType.Error, 10000); // Langere vertraging
+    }
+
+    private void ClearAllToasts()
+    {
+        ToastService.ClearAllToasts();
+    }
+}

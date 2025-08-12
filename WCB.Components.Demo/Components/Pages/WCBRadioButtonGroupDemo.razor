@@ -1,0 +1,100 @@
+﻿@page "/wcb-radiogroup-demo"
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+
+<h3>WCBRadioButtonGroup Demo Pagina</h3>
+<p>Deze pagina laat zien hoe de <code>WCBRadioButtonGroup</code> component gebruikt kan worden binnen een <code>EditForm</code>, inclusief data binding en validatie.</p>
+
+<EditForm Model="SelectedModel" OnValidSubmit="HandleValidSubmit" FormName="FaculteitForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div class="mb-3">
+        <label class="form-label">Kies een faculteit:</label>
+        <WCBRadioButtonGroup TItem="FaculteitDto" TValue="int?"
+                             Items="Faculteiten"
+                             @bind-Value="SelectedModel.SelectedFaculteitId"
+                             GetDisplayValue="fac => fac.Name"
+                             GetValue="fac => (int?)fac.Id" />
+        <ValidationMessage For="() => SelectedModel.SelectedFaculteitId" />
+    </div>
+    
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary me-2">Verzenden</button>
+        <button type="button" class="btn btn-secondary" @onclick="ResetForm">Reset</button>
+    </div>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_resultMessage))
+{
+    <div class="alert alert-info mt-3" role="alert">
+        @_resultMessage
+    </div>
+}
+
+@if (SelectedModel.SelectedFaculteitId.HasValue)
+{
+    <div class="mt-3">
+        <small class="text-muted">
+            Huidige selectie: ID = @SelectedModel.SelectedFaculteitId
+        </small>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// Data model voor een faculteit
+    /// </summary>
+    public class FaculteitDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Voorbeeld data voor de demo
+    /// </summary>
+    private readonly List<FaculteitDto> Faculteiten = new()
+    {
+        new FaculteitDto { Id = 1, Name = "Gedrags- en Maatschappijwetenschappen" },
+        new FaculteitDto { Id = 2, Name = "Rechtsgeleerdheid" },
+        new FaculteitDto { Id = 3, Name = "Medische Wetenschappen" },
+        new FaculteitDto { Id = 4, Name = "Letteren" }
+    };
+
+    private RadioDemoModel SelectedModel = new();
+    private string? _resultMessage;
+
+    /// <summary>
+    /// Behandelt een geldig verzonden formulier
+    /// </summary>
+    private void HandleValidSubmit()
+    {
+        var selectedFaculteit = Faculteiten
+            .FirstOrDefault(f => f.Id == SelectedModel.SelectedFaculteitId);
+            
+        _resultMessage = selectedFaculteit is not null
+            ? $"✅ Geselecteerde Faculteit: {selectedFaculteit.Name} (ID: {selectedFaculteit.Id})"
+            : "❌ Geen faculteit geselecteerd.";
+    }
+
+    /// <summary>
+    /// Reset het formulier naar de initiële staat
+    /// </summary>
+    private void ResetForm()
+    {
+        SelectedModel = new RadioDemoModel();
+        _resultMessage = null;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Model voor de demo met verbeterde validatie
+    /// </summary>
+    public class RadioDemoModel
+    {
+        [Required(ErrorMessage = "Selecteer een faculteit")]
+        [Range(1, int.MaxValue, ErrorMessage = "Selecteer een geldige faculteit")]
+        public int? SelectedFaculteitId { get; set; }
+    }
+}

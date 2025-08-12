@@ -1,0 +1,73 @@
+﻿<CascadingValue Value="this">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        @foreach (var tab in Tabs)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @(tab == ActiveTab ? "active" : "")"
+                        type="button"
+                        role="tab"
+                        onclick="@(() => ActivateTab(tab))">
+                    @tab.Title
+                </button>
+            </li>
+        }
+    </ul>
+
+    <div class="tab-content">
+        @if (ActiveTab?.ChildContent is not null)
+        {
+            <div class="tab-pane fade show active" role="tabpanel" @key="ActiveTab">
+                @if (ActiveTab?.Header is not null)
+                {
+                    <div class="tab-header">
+                        @ActiveTab.Header
+                    </div>
+                }
+                @ActiveTab.ChildContent
+            </div>
+        }
+    </div>
+
+    @* Dit is essentieel: hier worden de kind-componenten daadwerkelijk gerenderd. *@
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private List<WCBTab> Tabs { get; set; } = new();
+    private WCBTab? ActiveTab { get; set; }
+
+    internal void RegisterTab(WCBTab tab)
+    {
+        if (!Tabs.Contains(tab))
+        {
+            Tabs.Add(tab);
+            if (ActiveTab == null)
+            {
+                ActiveTab = tab;
+            }
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    internal void UnregisterTab(WCBTab tab)
+    {
+        if (Tabs.Contains(tab))
+        {
+            Tabs.Remove(tab);
+            if (ActiveTab == tab)
+            {
+                ActiveTab = Tabs.FirstOrDefault();
+            }
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ActivateTab(WCBTab tab)
+    {
+        ActiveTab = tab;
+        StateHasChanged();
+    }
+}

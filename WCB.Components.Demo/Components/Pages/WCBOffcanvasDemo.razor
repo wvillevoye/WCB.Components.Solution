@@ -1,0 +1,47 @@
+﻿@page "/offcanvas-demo"
+@using WCB.Components.Services
+@using WCB.Components.Services.WCBOffcanvas
+@inject WCBOffcanvasService OffcanvasService
+@rendermode InteractiveServer
+
+<h3>Offcanvas Demo</h3>
+
+<p>Klik op de knoppen hieronder om offcanvas-panelen met verschillende posities en groottes te tonen.</p>
+<WCBOffcanvas />
+
+
+<div class="row">
+    <h4>Positie Demo</h4>
+    <div class="col-12 d-flex gap-2 mb-4">
+        <button class="btn btn-primary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.Start)">Offcanvas Links</button>
+        <button class="btn btn-primary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.End)">Offcanvas Rechts</button>
+        <button class="btn btn-primary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.Top)">Offcanvas Boven</button>
+        <button class="btn btn-primary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.Bottom)">Offcanvas Onder</button>
+    </div>
+
+    <h4>Grootte Demo</h4>
+    <div class="col-12 d-flex gap-2">
+        <button class="btn btn-secondary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.End, WCBOffcanvasSize.Default)">Standaard Grootte</button>
+        <button class="btn btn-secondary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.End, WCBOffcanvasSize.Small)">Kleine Grootte</button>
+        <button class="btn btn-secondary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.End, WCBOffcanvasSize.Large)">Grote Grootte</button>
+        <button class="btn btn-secondary" @onclick="() => ShowOffcanvas(WCBOffcanvasPosition.End, WCBOffcanvasSize.Medium)">Medium Grootte</button>
+    </div>
+</div>
+
+@code {
+    private async Task ShowOffcanvas(WCBOffcanvasPosition position, WCBOffcanvasSize size = WCBOffcanvasSize.Default)
+    {
+        var options = new WCBOffcanvasOptions
+        {
+            Title = $"Offcanvas - {position} ({size})",
+            BodyContent = (
+                @<p>Dit is een demo van de offcanvas-component. De positie is <b>@position</b> en de grootte is <b>@size</b>.</p>
+            ),
+            Position = position,
+            Size = size
+        };
+
+        await OffcanvasService.ShowOffcanvas(options);
+    }
+}
+

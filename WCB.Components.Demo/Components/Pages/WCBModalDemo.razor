@@ -1,0 +1,25 @@
+﻿@page "/modal-demo"
+@using WCB.Components.Services.WCBModal
+@inject WCBModalService ModalService
+<PageTitle>ModalDemo</PageTitle>
+<WCBModal />
+<h1>Modal!</h1>
+
+<p>Modal voorbeeld.</p>
+
+<p>Klik op de knop om de modal te tonen.</p>
+<button class="btn btn-primary" @onclick="ShowModal">Toon Modal</button>
+
+
+@code {
+    private void ShowModal()
+    {
+        var options = new WCBModalOptions
+        {
+            Title = "Voorbeeld Modal",
+            BodyContent = @<p>Dit is de inhoud van de modal.</p>,
+            Size = "modal-lg" // Maak de modal groot
+        };
+        ModalService.Show(options);
+    }
+}

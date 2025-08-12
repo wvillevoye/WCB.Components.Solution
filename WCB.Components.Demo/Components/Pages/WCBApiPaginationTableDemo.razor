@@ -1,0 +1,36 @@
+﻿@page "/wcb-apipaginationtable-demo"
+
+@using System.Text.Json.Serialization
+
+<h3>GitHub Repos (dotnet org)</h3>
+
+<WCBApiPaginationTable T="GitHubRepo" ApiUrl="https://api.github.com/orgs/dotnet/repos">
+    <TableHeader>
+        <tr>
+            <th>Name</th>
+            <th>Stars</th>
+            <th>Language</th>
+        </tr>
+    </TableHeader>
+    <RowTemplate Context="repo">
+        <tr>
+            <td>@repo.Name</td>
+            <td>@repo.StargazersCount</td>
+            <td>@repo.Language</td>
+        </tr>
+    </RowTemplate>
+</WCBApiPaginationTable>
+
+@code {
+    public class GitHubRepo
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = "";
+
+        [JsonPropertyName("stargazers_count")]
+        public int StargazersCount { get; set; }
+
+        [JsonPropertyName("language")]
+        public string? Language { get; set; }
+    }
+}

@@ -1,0 +1,75 @@
+﻿@page "/input-select-demo"
+@using WCB.Components.Components
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+
+<h3>Input Select Demo</h3>
+<p>Deze pagina demonstreert de <code>WCBInputSelectDictionary</code> component met verschillende databronnen.</p>
+
+<EditForm Model="SelectedModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="countrySelect" class="form-label">Kies een land:</label>
+        <WCBInputSelect TKey="string" TValue="string"
+                        id="countrySelect"
+                        DataSource="@Countries"
+                        @bind-Value="SelectedModel.CountryId"
+                        PromptText="Selecteer een land" />
+    </div>
+
+    <div class="mb-3">
+        <label for="citySelect" class="form-label">Kies een stad:</label>
+        <WCBInputSelect TKey="int" TValue="string"
+                        id="citySelect"
+                        DataSource="@Cities"
+                        @bind-Value="SelectedModel.CityId"
+                        PromptText="" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verzenden</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_resultMessage))
+{
+    <div class="alert alert-info mt-3">@_resultMessage</div>
+}
+
+@code {
+    private Dictionary<string, string> Countries = new()
+    {
+        {"NL", "Nederland"},
+        {"BE", "België"},
+        {"DE", "Duitsland"}
+    };
+
+    private Dictionary<int, string> Cities = new()
+    {
+        {0, "Selecteer een stad"},
+        {1, "Amsterdam"},
+        {2, "Rotterdam"},
+        {3, "Antwerpen"}
+    };
+
+    private InputSelectDemoModel SelectedModel = new();
+
+    private string? _resultMessage;
+
+    private void HandleValidSubmit()
+    {
+        var land = Countries.GetValueOrDefault(SelectedModel.CountryId ?? "");
+        var stad = Cities.GetValueOrDefault(SelectedModel.CityId);
+
+        _resultMessage = $"Geselecteerd Land: {land}, Stad: {stad}";
+    }
+
+    public class InputSelectDemoModel
+    {
+        [Required(ErrorMessage = "Kies een land")]
+        public string? CountryId { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Kies een stad")]
+        public int CityId { get; set; } = 0; // Standaardwaarde is 0 (lege keuze)
+    }
+}

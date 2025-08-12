@@ -1,0 +1,86 @@
+﻿@typeparam TItem
+@typeparam TValue
+@* De parameters voor de component *@
+@if (Items is not null)
+{
+    @foreach (var (item, index) in Items.Select((item, index) => (item, index)))
+    {
+        var itemValue = GetValue(item);
+        var itemId = $"{GroupName}_{index}";
+        <div class="form-check form-check-inline">
+            @* De ID van de radio button wordt gegenereerd op basis van de index. *@
+            <input class="form-check-input"
+                   type="radio"
+                   name="@GroupName"
+                   id="@itemId"
+                   value="@itemValue?.ToString()"
+                   checked="@IsSelected(itemValue)"
+                   onchange="@((ChangeEventArgs e) => HandleRadioChange(itemValue))" />
+            <label class="form-check-label" for="@itemId">
+                @GetDisplayValue(item)
+            </label>
+        </div>
+    }
+}
+
+@code {
+    /// <summary>
+    /// De unieke naam voor de radiogroep. Radio buttons met dezelfde naam behoren tot dezelfde groep.
+    /// </summary>
+    [Parameter]
+    public string GroupName { get; set; } = "radiogroup_" + Guid.NewGuid().ToString("N")[..8];
+
+    /// <summary>
+    /// De lijst van items die als radio buttons getoond moeten worden.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TItem> Items { get; set; } = default!;
+
+    /// <summary>
+    /// De geselecteerde waarde van het radiogroep. Let op de '?' om nullable types te ondersteunen.
+    /// </summary>
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    /// <summary>
+    /// EventCallback om de geselecteerde waarde terug te sturen naar de parent component.
+    /// Het type is nu EventCallback<TValue?> om nullable types correct te verwerken.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Functie om de weergegeven tekst van een item te bepalen.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Func<TItem, string> GetDisplayValue { get; set; } = default!;
+
+    /// <summary>
+    /// Functie om de waarde van een item te bepalen.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Func<TItem, TValue> GetValue { get; set; } = default!;
+
+    /// <summary>
+    /// Controleert of een specifieke waarde geselecteerd is
+    /// </summary>
+    private bool IsSelected(TValue itemValue)
+    {
+        if (Value == null && itemValue == null) return true;
+        if (Value == null || itemValue == null) return false;
+        return EqualityComparer<TValue>.Default.Equals(Value, itemValue);
+    }
+
+    /// <summary>
+    /// Methode die wordt aangeroepen wanneer de selectie van een radio button verandert.
+    /// </summary>
+    /// <param name="newValue">De waarde van de geselecteerde radio button.</param>
+    private async Task HandleRadioChange(TValue newValue)
+    {
+        if (!IsSelected(newValue))
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+        }
+    }
+}

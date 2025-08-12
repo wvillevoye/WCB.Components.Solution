@@ -1,0 +1,19 @@
+﻿@page "/callout-demo"
+<PageTitle>CalloutDemo</PageTitle>
+
+<h1>Callout!</h1>
+
+<p>Callout voorbeelden.</p>
+
+
+<div class="d-flex flex-column gap-3">
+    <WCBCallout Message="Dit is een informatieve melding." Type="AlertType.Info" Dismissible="true" />
+    <WCBCallout Message="Actie succesvol uitgevoerd!" Type="AlertType.Success" Dismissible="true" />
+    <WCBCallout Message="Let op: Er is iets belangrijks gebeurd." Type="AlertType.Warning" Dismissible="true" />
+    <WCBCallout Message="Er is een kritieke fout opgetreden." Type="AlertType.Error" Dismissible="true" />
+    <WCBCallout Message="Deze melding kan niet worden gesloten." Type="AlertType.Info" Dismissible="false" />
+</div>
+
+@code {
+
+}

@@ -1,0 +1,189 @@
+﻿@*
+    WCBAccordionItem.razor
+    Component voor een enkel inklapbaar item binnen de WCBAccordion.
+    Maakt gebruik van Bootstrap's collapse-functionaliteit.
+*@
+
+<div class="accordion-item">
+    <h2 class="accordion-header" id="@ButtonId">
+        <button class="accordion-button @(IsCollapsed ? "collapsed" : "") @GetHeaderClasses()"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#@ContentId"
+                aria-expanded="@(!IsCollapsed)"
+                aria-controls="@ContentId"
+                disabled="@Disabled">
+            @if (Header != null)
+            {
+                @Header
+            }
+            else if (!string.IsNullOrEmpty(HeaderText))
+            {
+                @HeaderText
+            }
+        </button>
+    </h2>
+    <div id="@ContentId"
+         class="accordion-collapse collapse @(IsCollapsed ? "" : "show") @ContentCssClass"
+         aria-labelledby="@ButtonId"
+         data-bs-parent="@(AllowMultipleOpen ? "" : $"#{ParentAccordionId}")">
+        <div class="accordion-body">
+            @if (Content != null)
+            {
+                @Content
+            }
+            else if (!string.IsNullOrEmpty(ContentText))
+            {
+                <p>@ContentText</p>
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Een unieke ID voor de collapse-content.
+    /// </summary>
+    private string ContentId { get; set; } = $"collapse_{Guid.NewGuid().ToString("N")[..8]}";
+
+    /// <summary>
+    /// Een unieke ID voor de header-knop.
+    /// </summary>
+    private string ButtonId { get; set; } = $"heading_{Guid.NewGuid().ToString("N")[..8]}";
+
+    /// <summary>
+    /// De ID van de parent accordion, doorgegeven via CascadingParameter.
+    /// </summary>
+    [CascadingParameter]
+    private string? ParentAccordionId { get; set; }
+
+    /// <summary>
+    /// Bepaalt of meerdere items tegelijk open kunnen zijn.
+    /// </summary>
+    [CascadingParameter]
+    private bool AllowMultipleOpen { get; set; } = false;
+
+    /// <summary>
+    /// De header van het accordion item als RenderFragment.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    /// <summary>
+    /// De header van het accordion item als eenvoudige tekst.
+    /// Wordt gebruikt als Header RenderFragment niet is opgegeven.
+    /// </summary>
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    /// <summary>
+    /// De content van het accordion item als RenderFragment.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Content { get; set; }
+
+    /// <summary>
+    /// De content van het accordion item als eenvoudige tekst.
+    /// Wordt gebruikt als Content RenderFragment niet is opgegeven.
+    /// </summary>
+    [Parameter]
+    public string? ContentText { get; set; }
+
+    /// <summary>
+    /// Alternative content via ChildContent parameter.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Bepaalt of de content standaard is ingeklapt.
+    /// </summary>
+    [Parameter]
+    public bool IsCollapsed { get; set; } = true;
+
+    /// <summary>
+    /// Bepaalt of het accordion item uitgeschakeld is.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// Optionele CSS-klasse voor de header button.
+    /// </summary>
+    [Parameter]
+    public string? HeaderCssClass { get; set; }
+
+    /// <summary>
+    /// Optionele CSS-klasse voor de content container.
+    /// </summary>
+    [Parameter]
+    public string? ContentCssClass { get; set; }
+
+    /// <summary>
+    /// Event dat wordt aangeroepen wanneer het item wordt geopend of gesloten.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> OnToggle { get; set; }
+
+    /// <summary>
+    /// Bepaalt of de WCB custom styling wordt toegepast.
+    /// </summary>
+    [Parameter]
+    public bool UseWcbStyling { get; set; } = true;
+
+    /// <summary>
+    /// Methode om het item programmatisch te openen of sluiten.
+    /// </summary>
+    public void Toggle()
+    {
+        IsCollapsed = !IsCollapsed;
+        OnToggle.InvokeAsync(IsCollapsed);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Krijgt de combined header CSS classes.
+    /// </summary>
+    private string GetHeaderClasses()
+    {
+        var classes = new List<string>();
+
+        if (UseWcbStyling)
+            classes.Add("wcb-accordion-header");
+
+        if (!string.IsNullOrEmpty(HeaderCssClass))
+            classes.Add(HeaderCssClass);
+
+        return string.Join(" ", classes);
+    }
+
+    /// <summary>
+    /// Methode om het item programmatisch te openen.
+    /// </summary>
+    public void Expand()
+    {
+        if (IsCollapsed)
+        {
+            IsCollapsed = false;
+            OnToggle.InvokeAsync(IsCollapsed);
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Methode om het item programmatisch te sluiten.
+    /// </summary>
+    public void Collapse()
+    {
+        if (!IsCollapsed)
+        {
+            IsCollapsed = true;
+            OnToggle.InvokeAsync(IsCollapsed);
+            StateHasChanged();
+        }
+    }
+}

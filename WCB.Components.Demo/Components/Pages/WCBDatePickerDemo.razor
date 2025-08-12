@@ -1,0 +1,19 @@
+﻿@page "/wcb-DatePicker-Demo"
+<h3>Blazor Datumkiezer Demo</h3>
+
+<p>De Blazor-component hieronder demonstreert hoe je een datum kunt selecteren.</p>
+
+<WCBDatepicker @bind-Value="gekozenDatum" />
+
+@if (gekozenDatum.HasValue)
+{
+    <p>De geselecteerde datum is: @gekozenDatum.Value.ToString("dd-MM-yyyy")</p>
+}
+else
+{
+    <p>Nog geen datum geselecteerd.</p>
+}
+
+@code {
+    private DateOnly? gekozenDatum;
+}

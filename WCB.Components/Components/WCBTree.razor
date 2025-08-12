@@ -1,0 +1,97 @@
+﻿@typeparam TNode
+
+<ul class="list-group list-group-flush border-0 ps-3">
+    @foreach (var node in Nodes)
+    {
+        <li class="list-group-item p-1 d-flex align-items-center border-0 ">
+            
+            @* Weergeef een klikbare link, tenzij de href leeg is of "#" is *@
+            @if (!string.IsNullOrEmpty(GetHref(node)) && GetHref(node) != "#")
+            {
+                @if (IsInternalLink(GetHref(node)))
+                {
+                    <a class="nav-link d-flex align-items-center text-decoration-none"
+                             href="@GetHref(node)"
+                             Match="NavLinkMatch.Prefix">
+                        <span class="@GetIconClass(node) me-2"></span>
+                        <span>@GetLabel(node)</span>
+                    </a>
+                }
+                else
+                {
+                    <a href="@GetHref(node)"
+                       class="nav-link d-flex align-items-center text-decoration-none"
+                       target="_blank" rel="noopener noreferrer">
+                        <span class="@GetIconClass(node) me-2"></span>
+                        <span>@GetLabel(node)</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="nav-link d-flex align-items-center text-decoration-none">
+                    <span class="@GetIconClass(node) me-2"></span>
+                    <span>@GetLabel(node)</span>
+                </div>
+            }
+
+            @if (HasChildren(node))
+            {
+                <button type="button"
+                        class="caret-btn ms-2"
+                        onclick="@(() => ToggleNode(node))"
+                        aria-expanded="@IsExpanded(node)"
+                        aria-label="Toggle node">
+                    <span class="@GetExpandIconClass(node)"></span>
+                </button>
+            }
+            else
+            {
+                <span class="me-4"></span>
+            }
+
+        </li>
+        
+        @if (HasChildren(node) && IsExpanded(node))
+        {
+            <WCBTree TNode="TNode"
+                     Nodes="GetChildren(node)"
+                     GetLabel="GetLabel"
+                     GetIconClass="GetIconClass"
+                     GetHref="GetHref"
+                     GetChildren="GetChildren" />
+        }
+    }
+</ul>
+
+@code {
+    [Parameter] public List<TNode> Nodes { get; set; } = new();
+    [Parameter] public Func<TNode, string> GetLabel { get; set; } = _ => "";
+    [Parameter] public Func<TNode, string> GetIconClass { get; set; } = _ => "";
+    [Parameter] public Func<TNode, string> GetHref { get; set; } = _ => "#";
+    [Parameter] public Func<TNode, List<TNode>> GetChildren { get; set; } = _ => new List<TNode>();
+    
+    private HashSet<TNode> expandedNodes = new();
+    
+    private bool IsExpanded(TNode node) => expandedNodes.Contains(node);
+    private bool HasChildren(TNode node) => GetChildren(node).Any();
+    
+    private void ToggleNode(TNode node)
+    {
+        if (expandedNodes.Contains(node))
+            expandedNodes.Remove(node);
+        else
+            expandedNodes.Add(node);
+        StateHasChanged();
+    }
+    
+    private string GetExpandIconClass(TNode node)
+    {
+        return $"bi {(IsExpanded(node) ? "bi-chevron-down" : "bi-chevron-up")}";
+    }
+    
+    private bool IsInternalLink(string url)
+    {
+        return !string.IsNullOrWhiteSpace(url) && url.StartsWith("/");
+    }
+}

@@ -1,0 +1,31 @@
+﻿<input type="date"
+       id="@_inputId"
+       class="form-control"
+       value="@ValueAsString"
+       onchange="@OnDateChanged" />
+
+@code {
+    [Parameter]
+    public DateOnly? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<DateOnly?> ValueChanged { get; set; }
+
+    private string _inputId = Guid.NewGuid().ToString();
+
+    private string? ValueAsString => Value?.ToString("yyyy-MM-dd");
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateOnly.TryParse(e.Value?.ToString(), out var newDate))
+        {
+            Value = newDate;
+            await ValueChanged.InvokeAsync(newDate);
+        }
+        else
+        {
+            Value = null;
+            await ValueChanged.InvokeAsync(null);
+        }
+    }
+}
