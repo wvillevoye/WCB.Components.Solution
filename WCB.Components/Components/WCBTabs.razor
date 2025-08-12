@@ -1,4 +1,5 @@
-﻿<CascadingValue Value="this">
+﻿@inject IJSRuntime JSRuntime
+<CascadingValue Value="this">
     <ul class="nav nav-tabs mb-3" role="tablist">
         @foreach (var tab in Tabs)
         {
@@ -65,9 +66,17 @@
         }
     }
 
-    private void ActivateTab(WCBTab tab)
+    private async Task ActivateTab(WCBTab tab)
     {
         ActiveTab = tab;
         StateHasChanged();
+        // Wacht tot Blazor de DOM heeft bijgewerkt
+        await Task.Delay(1);
+
+        // Roep Prism.js aan als het geselecteerde tabblad 'Code' is
+        if (ActiveTab?.Title == "WCBCode")
+        {
+            await JSRuntime.InvokeVoidAsync("Prism.highlightAll");
+        }
     }
 }
